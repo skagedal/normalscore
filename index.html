@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>Normal Score Converter</title>
+        <link rel="stylesheet" type="text/css" media="screen" 
+	      href="normalscore.css" />	
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/jquery.flot.min.js"></script>
+        <script type="text/javascript" src="js/jquery.flot.crosshair.min.js">
+	</script>
+        <script type="text/javascript" src="js/jstat.min.js"></script>
+        <script type="text/javascript" src="js/normalscore.js"></script>
+    </head>
+    <body>
+	<h2>Input</h2>
+
+	<p>
+	  <select>
+	    <option value="z">Z-score</option>
+	    <option value="iq">IQ</option>
+	    <option value="perc">Percentile</option>
+	    <option value="stanine">Stanine</option>
+	  </select>
+	</p>
+
+        <div id="plot" style="width:600px; height: 200px;"></div>
+
+
+	<h2>Output</h2>
+	<table class="output">
+	  <tbody>
+	    <tr id="outputHeader">
+	      <th>Z</th>
+	      <th>Percentile</th>
+	      <th>IQ</th>
+	      <th>Stanine</th>
+	    </td>
+	  </table>
+	</tbody>
+    </body>
+</html>
