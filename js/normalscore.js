@@ -14,6 +14,7 @@ function update_scales(z) {
     var perc = roundNumber(jStat.normal.cdf(z, 0, 1) * 100, 2);
     var iq = roundNumber(z * 15 + 100, 1);
     var stanine = Math.min(9, Math.max(1, Math.round(z * 2 + 5)));
+    var w19 = Math.min(19, Math.max(1, Math.round(z * 3 + 10)));
 
     $("#outputHeader").after("<tr><td>" + normal + "</td><td>" + 
 			     perc + "</td><td>" + iq + "</td><td>" + 
