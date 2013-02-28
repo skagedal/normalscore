@@ -1,7 +1,23 @@
 var normalPlot;
 
-function IQ(iq) { return (iq - 100.0) / 15.0; }
-function toIQ(z) { return z * 15.0 + 100; }
+function fromIQ(iq) { return (iq - 100) / 15; }
+function toIQ(z) { return z * 15 + 100; }
+
+function fromZ(z) { return z; }
+function toZ(z) { return z; }
+
+function fromPerc(perc) { return jStat.normal.inv(perc / 100, 0, 1); }
+function toPerc(z) { return jStat.normal.cdf(z, 0, 1) * 100; }
+
+function fromStanine(stanine) { return (stanine - 5) / 2; }
+function toStanine(z) { 
+    return Math.min(9, Math.max(1, Math.round(z * 2 + 5))); 
+}
+
+function fromSta19(s19) { return (s19 - 10) / 3; }
+function toSta19(z) {
+    return Math.min(19, Math.max(1, Math.round(z * 3 + 10)));
+}
 
 function roundNumber(number, digits) {
     var multiple = Math.pow(10, digits);
@@ -11,14 +27,14 @@ function roundNumber(number, digits) {
 
 function update_scales(z) {
     var normal = roundNumber(z, 2);
-    var perc = roundNumber(jStat.normal.cdf(z, 0, 1) * 100, 2);
-    var iq = roundNumber(z * 15 + 100, 1);
-    var stanine = Math.min(9, Math.max(1, Math.round(z * 2 + 5)));
-    var w19 = Math.min(19, Math.max(1, Math.round(z * 3 + 10)));
+    var perc = roundNumber(toPerc(z), 2);
+    var iq = roundNumber(toIQ(z), 1);
+    var stanine = toStanine(z);
+    var sta19 = toSta19(z);
 
     $("#outputHeader").after("<tr><td>" + normal + "</td><td>" + 
 			     perc + "</td><td>" + iq + "</td><td>" + 
-			     stanine + "</td></tr>");
+			     stanine + "</td><td>" + sta19 + "</td></tr>");
 
     var colors = ["#ff0000", "#ff8888", "#ffcccc", "#ffeeee"];
     var i;
@@ -37,45 +53,19 @@ function update_scales(z) {
 }
 
 
-function blur_normal(event) {
-    var z = parseFloat(event.target.value);
-    update_scales(z);
-}
-
-function blur_percentile(event) {
-    var z = jStat.normal.inv(parseFloat(event.target.value) / 100, 0, 1);
-    update_scales(z);
-}
-
-function blur_iq(event) {
-    var z = (parseFloat(event.target.value) - 100.0) / 15.0;
-    update_scales(z);
-}
-
-function blur_stanine(event) {
-    var z = (parseFloat(event.target.value) - 5.0) / 2.0;
-    update_scales(z);
-}
-
 $(document).ready(function() {
     var curve = [];
     for (var i = -5; i <= 5.0; i += 0.1)
         curve.push([i, jStat.normal.pdf(i, 0, 1)]);
 
     normalPlot = $.plot($("#plot"), [
-	{ data: curve, label: "Normalfördelning"}
+	{ data: curve, label: null}
     ], {
 	crosshair: {
 	    mode: "x"
 	},
 	grid: {
-	    markings: [
-/*		{ 
-		    // Update this value and call normalPlot.draw()
-		    xaxis: { from: -0, to: 0 },
-		    color: "#ff0000"
-		} */
-	    ],
+	    markings: [],
 	    clickable: true,
 	    hoverable: true
 	}
@@ -86,9 +76,29 @@ $(document).ready(function() {
 	update_scales(pos.x);
     });
 
-/*    
-    $("#normal").blur(blur_normal);
-    $("#percentile").blur(blur_percentile);
-    $("#iq").blur(blur_iq);
-    $("#stanine").blur(blur_stanine); */
+    $("select#inputtype").change(function() {
+	$("#score").val("");
+    });
+
+    $("#scoreform").submit(function() {
+	var score = parseFloat($("#score").val());
+	switch($("#inputtype").val()) {
+	case 'z':
+	    update_scales(score);
+	    break;
+	case 'iq':
+	    update_scales(fromIQ(score));
+	    break;
+	case 'perc':
+	    update_scales(fromPerc(score));
+	    break;
+	case 'stanine':
+	    update_scales(fromStanine(score));
+	    break;
+	case 'sta19':
+	    update_scales(fromSta19(score));
+	    break;
+	}
+	return false;
+    });
 });
