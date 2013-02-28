@@ -25,7 +25,7 @@ function roundNumber(number, digits) {
     return roundedNum;
 }
 
-function update_scales(z) {
+function addScore(z) {
     var normal = roundNumber(z, 2);
     var perc = roundNumber(toPerc(z), 2);
     var iq = roundNumber(toIQ(z), 1);
@@ -52,6 +52,11 @@ function update_scales(z) {
     normalPlot.draw();
 }
 
+function updateTooltip(z) {
+    $("#tooltip").html(sprintf(
+	"Z=%.3f, Perc=%.2f, IQ=%.1f, Stanine=%d, Standard 19=%d", 
+	z, toPerc(z), toIQ(z), toStanine(z), toSta19(z)));
+}
 
 $(document).ready(function() {
     var curve = [];
@@ -73,7 +78,15 @@ $(document).ready(function() {
     });
 
     $("#plot").bind("plotclick", function (event, pos, item) {
-	update_scales(pos.x);
+	addScore(pos.x);
+    });
+
+    $("#plot").bind("plothover", function (event, pos, item) {
+	$("#tooltip").show();
+	updateTooltip(pos.x);
+    });
+    $("#plot").mouseleave(function (event) {
+	$("#tooltip").hide();
     });
 
     $("select#inputtype").change(function() {
@@ -84,21 +97,22 @@ $(document).ready(function() {
 	var score = parseFloat($("#score").val());
 	switch($("#inputtype").val()) {
 	case 'z':
-	    update_scales(score);
+	    addScore(score);
 	    break;
 	case 'iq':
-	    update_scales(fromIQ(score));
+	    addScore(fromIQ(score));
 	    break;
 	case 'perc':
-	    update_scales(fromPerc(score));
+	    addScore(fromPerc(score));
 	    break;
 	case 'stanine':
-	    update_scales(fromStanine(score));
+	    addScore(fromStanine(score));
 	    break;
 	case 'sta19':
-	    update_scales(fromSta19(score));
+	    addScore(fromSta19(score));
 	    break;
 	}
+	$("#score").val("");
 	return false;
     });
 });

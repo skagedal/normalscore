@@ -1,3 +1,37 @@
+body {
+    text-align: center;
+}
+
+body div {
+    text-align: left;
+    width: 700px;
+    margin: 0px auto;
+}
+
+p.info {
+    font-size: small;
+    color: grey;
+}
+
+h2 {
+    font-variant: small-caps;
+    border-top: 1px solid black;
+}
+
+#score {
+    text-align: right; 
+}
+
+#plot {
+    width: 600px;
+    height: 200px;
+}
+
+#tooltip {
+    position: fixed;
+    color: grey;
+}
+
 .output {
     border-collapse: collapse;
     border: 1px solid black

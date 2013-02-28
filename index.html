@@ -12,13 +12,22 @@
         <script type="text/javascript" src="js/jquery.flot.crosshair.min.js">
 	</script>
         <script type="text/javascript" src="js/jstat.min.js"></script>
+	<script type="text/javascript" src="js/sprintf-0.7-beta1.js"></script>
         <script type="text/javascript" src="js/normalscore.js"></script>
     </head>
     <body>
+      <div>
+
+	<p class="info">This is a tool to convert normally distributed
+	variables between scales commonly used by psychologists. <br />
+	  <a href="https://github.com/skagedal/normalscore">Code.</a>
+	  <a href="mailto:skagedal@gmail.com">Contact.</a>
+	</p>
+
 	<h2>Input</h2>
 
 	<p>
-	  <form id="scoreform">
+	  <form id="scoreform" autocomplete="off">
 	    <select id="inputtype">
 	      <option value="z">Z-score</option>
 	      <option value="iq">IQ</option>
@@ -26,13 +35,14 @@
 	      <option value="stanine">Stanine</option>
 	      <option value="sta19">Standard 19</option>
 	    </select>
-	    <input id="score" type="text"></input>
+	    <input id="score" type="text" autocomplete="off"></input>
 	    <input type="submit" value="Go"></input>
 	  </form>
 	</p>
 
-        <div id="plot" style="width:600px; height: 200px;"></div>
+        <div id="plot">&nbsp;</div>
 
+	<p id="tooltip"></p><br /><br />
 
 	<h2>Output</h2>
 	<table class="output">
@@ -43,8 +53,10 @@
 	      <th>IQ</th>
 	      <th>Stanine</th>
 	      <th>Standard 19</th>
-	    </td>
-	  </table>
-	</tbody>
+	    </tr>
+	  </tbody>
+	</table>
+      </div>
+      
     </body>
 </html>
