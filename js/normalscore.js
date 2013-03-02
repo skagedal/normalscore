@@ -90,7 +90,6 @@ function fromScale(scaleValue, scaleInfo) {
 	// Arbitrary clamping of input percentile to avoid silliness
 	var p = Math.min(0.9999999, 
 			 Math.max(0.0000001, (scaleValue - offset) / factor));
-	console.log(p);
 	z = jStat.normal.inv(p, 0, 1);
 	break;
     }
