@@ -32,6 +32,12 @@ var defaultScales = [
      SD: 2,
      min: 1,
      max: 10},
+    {name: "Standard 19",
+     type: SCALETYPE_DISCRETE,
+     M: 10,
+     SD: 3,
+     min: 1,
+     max: 19},
     {name: "Percentile",
      type: SCALETYPE_PERCENTILE,
      SD: 100,			// used here for scaling
@@ -39,7 +45,7 @@ var defaultScales = [
 ];
 
 var defaultScaleOrder = [
-    "Z-score", "IQ", "T-score", "Stanine", "Sten", "Percentile"];
+    "Z-score", "IQ", "T-score", "Stanine", "Sten", "Standard 19", "Percentile"];
 
 function getScaleInfo(scaleName) {
     return $.grep(defaultScales, function (element, index) {
