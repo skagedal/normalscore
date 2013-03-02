@@ -28,8 +28,9 @@ h2 {
 }
 
 #tooltip {
-    position: fixed;
-    color: grey;
+    position: absolute;
+    border: 1px solid #777700;
+    background-color: #ffffdd;
 }
 
 .output {

@@ -1,25 +1,107 @@
 var normalPlot;
 
-function fromIQ(iq) { return (iq - 100) / 15; }
-function toIQ(z) { return z * 15 + 100; }
+var SCALETYPE_NORMAL = 1;
+var SCALETYPE_DISCRETE = 2;
+var SCALETYPE_PERCENTILE = 3;
 
-function fromZ(z) { return z; }
-function toZ(z) { return z; }
+var defaultScales = [
+    {name: "Z-score",
+     type: SCALETYPE_NORMAL,
+     M: 0,
+     SD: 1,
+     digits: 2},
+    {name: "IQ",
+     type: SCALETYPE_NORMAL,
+     M: 100,
+     SD: 15,
+     digits: 1},
+    {name: "T-score",
+     type: SCALETYPE_NORMAL,
+     M: 50,
+     SD: 10,
+     digits: 1},
+    {name: "Stanine",
+     type: SCALETYPE_DISCRETE,
+     M: 5,
+     SD: 2,
+     min: 1,
+     max: 9},
+    {name: "Sten",
+     type: SCALETYPE_DISCRETE,
+     M: 5.5,
+     SD: 2,
+     min: 1,
+     max: 10},
+    {name: "Percentile",
+     type: SCALETYPE_PERCENTILE,
+     SD: 100,			// used here for scaling
+     digits: 2}
+];
 
-function fromT(t) { return (t - 50) / 10; }
-function toT(z) { return z * 10 + 50; }
+var defaultScaleOrder = [
+    "Z-score", "IQ", "T-score", "Stanine", "Sten", "Percentile"];
 
-function fromPerc(perc) { return jStat.normal.inv(perc / 100, 0, 1); }
-function toPerc(z) { return jStat.normal.cdf(z, 0, 1) * 100; }
-
-function fromStanine(stanine) { return (stanine - 5) / 2; }
-function toStanine(z) { 
-    return Math.min(9, Math.max(1, Math.round(z * 2 + 5))); 
+function getScaleInfo(scaleName) {
+    return $.grep(defaultScales, function (element, index) {
+	return element.name === scaleName; 
+    })[0];
 }
 
-function fromSta19(s19) { return (s19 - 10) / 3; }
-function toSta19(z) {
-    return Math.min(19, Math.max(1, Math.round(z * 3 + 10)));
+function toScale(z, scaleInfo) {
+    var scaleValue;
+    // "SD" should really be read as scale factor, and "M" as offset
+    var factor = $.isNumeric(scaleInfo.SD) ? scaleInfo.SD : 1;
+    var offset = $.isNumeric(scaleInfo.M) ? scaleInfo.M : 0;
+    switch(scaleInfo.type) {
+    case SCALETYPE_NORMAL:
+	scaleValue = z * factor + offset;
+	break;
+    case SCALETYPE_DISCRETE:
+	scaleValue = Math.round(z * factor + offset);
+	break;
+    case SCALETYPE_PERCENTILE:
+	scaleValue = jStat.normal.cdf(z, 0, 1) * factor + offset;
+	break;
+    }
+    if ($.isNumeric(scaleInfo.min))
+	scaleValue = Math.max(scaleValue, scaleInfo.min);
+    if ($.isNumeric(scaleInfo.max))
+	scaleValue = Math.min(scaleValue, scaleInfo.max);
+
+    return scaleValue;
+}
+   
+function fromScale(scaleValue, scaleInfo) {
+    var z;
+    // "SD" should really be read as scale factor, and "M" as offset
+    var factor = $.isNumeric(scaleInfo.SD) ? scaleInfo.SD : 1;
+    var offset = $.isNumeric(scaleInfo.M) ? scaleInfo.M : 0;
+
+    // When converting from scales to Z, we allow discrete values to 
+    // be continuous and for values to break max/min boundaries,
+    // such as "Stanine 19.3". Not sure if this makes sense, but 
+    // if the user asks for it...? 
+    switch(scaleInfo.type) {
+    case SCALETYPE_NORMAL:
+    case SCALETYPE_DISCRETE:
+	z = (scaleValue - offset) / factor;
+	break;
+    case SCALETYPE_PERCENTILE:
+	// Arbitrary clamping of input percentile to avoid silliness
+	var p = Math.min(0.9999999, 
+			 Math.max(0.0000001, (scaleValue - offset) / factor));
+	console.log(p);
+	z = jStat.normal.inv(p, 0, 1);
+	break;
+    }
+    
+    return z;
+}
+
+function toScaleFormattedString(z, scaleInfo) {
+    // Converts z score to scale and formats it 
+    var fmt = sprintf("%%.%df", scaleInfo.digits ? scaleInfo.digits : 0);
+    return sprintf(fmt, toScale(z, scaleInfo));
 }
 
 function roundNumber(number, digits) {
@@ -29,17 +111,14 @@ function roundNumber(number, digits) {
 }
 
 function addScore(z) {
-    var normal = roundNumber(z, 2);
-    var perc = roundNumber(toPerc(z), 2);
-    var iq = roundNumber(toIQ(z), 1);
-    var t = roundNumber(toT(z), 1);
-    var stanine = toStanine(z);
-    var sta19 = toSta19(z);
+    var rowHtml = "<tr>" +
+	$.map(defaultScaleOrder, function (scaleName, index) {
+	    var scaleInfo = getScaleInfo(scaleName);
+	    return "<td>" + toScaleFormattedString(z, scaleInfo) + "</td>"
+	}) +
+	"</tr>";
 
-    $("#outputHeader").after("<tr><td>" + normal + "</td><td>" + 
-			     perc + "</td><td>" + iq + "</td><td>" + 
-			     t + "</td><td>" +
-			     stanine + "</td><td>" + sta19 + "</td></tr>");
+    $("#outputHeader").after(rowHtml); 
 
     var colors = ["#ff0000", "#ff8888", "#ffcccc", "#ffeeee"];
     var i;
@@ -58,9 +137,9 @@ function addScore(z) {
 }
 
 function updateTooltip(z) {
-    $("#tooltip").html(sprintf(
-	"Z=%.3f, Perc=%.2f, IQ=%.1f, T=%.1f, Stanine=%d, Standard 19=%d", 
-	z, toPerc(z), toIQ(z), toT(z), toStanine(z), toSta19(z)));
+    $("#tooltip").html($.map(defaultScaleOrder, function(name) {
+	return name + "=" + toScaleFormattedString(z, getScaleInfo(name));
+    }).join(", "));
 }
 
 $(document).ready(function() {
@@ -100,27 +179,21 @@ $(document).ready(function() {
 
     $("#scoreform").submit(function() {
 	var score = parseFloat($("#score").val());
-	switch($("#inputtype").val()) {
-	case 'z':
-	    addScore(score);
-	    break;
-	case 'iq':
-	    addScore(fromIQ(score));
-	    break;
-	case 't':
-	    addScore(fromT(score));
-	    break;
-	case 'perc':
-	    addScore(fromPerc(score));
-	    break;
-	case 'stanine':
-	    addScore(fromStanine(score));
-	    break;
-	case 'sta19':
-	    addScore(fromSta19(score));
-	    break;
-	}
+	var scaleName = $("#inputtype").val();
+	var scaleInfo = getScaleInfo(scaleName);
+	addScore(fromScale(score, scaleInfo));
+
 	$("#score").val("");
-	return false;
+	return false;		// abort default submit
     });
+
+    $("select#inputtype").append($.map(defaultScaleOrder, function(name) {
+	return sprintf("<option value=\"%s\">%s</option>", name, name);
+    }));
+
+    $("table.output tbody").append("<tr id=\"outputHeader\">" +
+				   $.map(defaultScaleOrder, function(name) {
+				       return "<th>" + name + "</th>"; 
+				   }) +
+				   "</tr>");
 });
