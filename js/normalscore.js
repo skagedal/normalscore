@@ -120,7 +120,7 @@ function addScore(z) {
 	$.map(defaultScaleOrder, function (scaleName, index) {
 	    var scaleInfo = getScaleInfo(scaleName);
 	    return "<td>" + toScaleFormattedString(z, scaleInfo) + "</td>"
-	}) +
+	}).join("") +
 	"</tr>";
 
     $("#outputHeader").after(rowHtml); 
@@ -199,6 +199,7 @@ $(document).ready(function() {
     $("table.output tbody").append("<tr id=\"outputHeader\">" +
 				   $.map(defaultScaleOrder, function(name) {
 				       return "<th>" + name + "</th>"; 
-				   }) +
+				   }).join("") +
 				   "</tr>");
+				   
 });
