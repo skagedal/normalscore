@@ -1,0 +1,21 @@
+We want a grid with the following features:
+
+* clean, good looks
+* easy to use API
+* integrates well with jQuery 
+* enables editing
+* read-only cells
+
+handsontable
+============
+
+* http://handsontable.com/
+* is clean, seems easy to use, jQuery-ish, editing, read-only
+
+DataTables
+==========
+
+* http://datatables.net/
+* finding this a bit bloated, only editable with new plugin
+
+Some others - I dunno, handsontable seems by far the nicest for my purposes.

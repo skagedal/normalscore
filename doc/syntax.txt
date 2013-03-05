@@ -1,0 +1,40 @@
+Man kan skriva in ett värde:
+
+  100
+
+Punkt används som decimalseparator:
+
+  -1.2
+
+Man kan ge värdet ett namn:
+
+  Verbal=70
+
+Man kan ange flera värden på en gång:
+
+  40,50,60
+
+Och ge dem namn:
+
+  Verbal=73,Perceptuell=50,Arbetsminne=60
+
+Man kan ange spann:
+
+  50:70
+
+Och ge namn:
+
+  Lindrig=50:70
+
+Utelämnar man ena delen av spannet så antas oändlighet:
+
+  US=:70
+
+Men om man anger flera på en gång så är startvärdet slutvärdet på föregående:
+
+  Måttlig=:50,Lindrig=:70,Normal=:
+
+Detta tolkas som Måttlig=-Infinity:50,Lindrig=50:70,Normal=70:+Infinity
+
+Denna syntax används även i skalredigeringsläge för att definiera
+kategorier.
