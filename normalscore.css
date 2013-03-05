@@ -2,7 +2,7 @@ body {
     text-align: center;
 }
 
-body div {
+#contentDiv {
     text-align: left;
     width: 700px;
     margin: 0px auto;
