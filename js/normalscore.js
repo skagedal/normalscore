@@ -44,6 +44,9 @@ var defaultScales = [
      digits: 2}
 ];
 
+// deep copy
+var myScales = $.extend(true, [], defaultScales);
+
 var defaultScaleOrder = [
     "Z-score", "IQ", "T-score", "Stanine", "Sten", "Standard 19", "Percentile"];
 
@@ -201,5 +204,17 @@ $(document).ready(function() {
 				       return "<th>" + name + "</th>"; 
 				   }).join("") +
 				   "</tr>");
+
+    $("#setupScales").handsontable({
+	data: myScales,
+	colHeaders: ["Name", "Type", "M", "SD", "Digits"],
+	columns: [
+	    {data: "name"},
+	    {data: "type"},
+	    {data: "M"},
+	    {data: "SD"},
+	    {data: "digits"}
+	]
+    });
 				   
 });
