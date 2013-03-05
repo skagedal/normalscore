@@ -14,8 +14,8 @@ p.info {
 }
 
 h2 {
-    font-variant: small-caps;
-    border-top: 1px solid black;
+    font-weight: bold;
+    font-size: medium;
 }
 
 #score {
