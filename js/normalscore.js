@@ -1,57 +1,71 @@
+var NormalScore = {
+    zscores: [],
+    gridData: [],
+    defaultScales: null,
+    scales: null,
+};
+
 var normalPlot;
 
-var SCALETYPE_NORMAL = 1;
-var SCALETYPE_DISCRETE = 2;
-var SCALETYPE_PERCENTILE = 3;
+var SCALETYPE_NORMAL = "Normal";
+var SCALETYPE_DISCRETE = "Discrete";
+var SCALETYPE_PERCENTILE = "Percentile";
 
-var defaultScales = [
+NormalScore.defaultScales = [
     {name: "Z-score",
      type: SCALETYPE_NORMAL,
      M: 0,
      SD: 1,
-     digits: 2},
+     digits: 2,
+     show: true},
     {name: "IQ",
      type: SCALETYPE_NORMAL,
      M: 100,
      SD: 15,
-     digits: 1},
+     digits: 1,
+     show: true},
     {name: "T-score",
      type: SCALETYPE_NORMAL,
      M: 50,
      SD: 10,
-     digits: 1},
+     digits: 1,
+     show: true},
     {name: "Stanine",
      type: SCALETYPE_DISCRETE,
      M: 5,
      SD: 2,
      min: 1,
-     max: 9},
+     max: 9,
+     show: true},
     {name: "Sten",
      type: SCALETYPE_DISCRETE,
      M: 5.5,
      SD: 2,
      min: 1,
-     max: 10},
+     max: 10,
+     show: false},
     {name: "Standard 19",
      type: SCALETYPE_DISCRETE,
      M: 10,
      SD: 3,
      min: 1,
-     max: 19},
+     max: 19,
+     show: true},
     {name: "Percentile",
      type: SCALETYPE_PERCENTILE,
      SD: 100,			// used here for scaling
-     digits: 2}
+     digits: 2,
+     show: true}
 ];
 
 // deep copy
-var myScales = $.extend(true, [], defaultScales);
+NormalScore.scales = $.extend(true, [], NormalScore.defaultScales);
 
 var defaultScaleOrder = [
     "Z-score", "IQ", "T-score", "Stanine", "Sten", "Standard 19", "Percentile"];
 
 function getScaleInfo(scaleName) {
-    return $.grep(defaultScales, function (element, index) {
+    return $.grep(NormalScore.scales, function (element, index) {
 	return element.name === scaleName; 
     })[0];
 }
@@ -118,15 +132,31 @@ function roundNumber(number, digits) {
     return roundedNum;
 }
 
-function addScore(z) {
-    var rowHtml = "<tr>" +
-	$.map(defaultScaleOrder, function (scaleName, index) {
-	    var scaleInfo = getScaleInfo(scaleName);
-	    return "<td>" + toScaleFormattedString(z, scaleInfo) + "</td>"
-	}).join("") +
-	"</tr>";
+function plucker(key) {
+    return (function (obj) { 
+	return obj[key]; 
+    });
+}
 
-    $("#outputHeader").after(rowHtml); 
+function renderScoreTable() {
+    var activeScales = NormalScore.scales.filter(plucker("show"));
+    var colHeaders = activeScales.map(plucker("name"));
+    var newData = NormalScore.zscores.map(function (z) {
+	return activeScales.map(function(scale) {
+	    return toScaleFormattedString(z, scale);
+	});
+    });
+    console.log(colHeaders);
+    console.log(newData);
+    $("#outputTable").handsontable('loadData', newData);
+    $("#outputTable").handsontable('updateSettings', 
+				   {colHeaders: colHeaders});
+}
+
+function addScore(z) {
+    NormalScore.zscores.push(z);
+
+    renderScoreTable();
 
     var colors = ["#ff0000", "#ff8888", "#ffcccc", "#ffeeee"];
     var i;
@@ -199,22 +229,53 @@ $(document).ready(function() {
 	return sprintf("<option value=\"%s\">%s</option>", name, name);
     }));
 
-    $("table.output tbody").append("<tr id=\"outputHeader\">" +
-				   $.map(defaultScaleOrder, function(name) {
-				       return "<th>" + name + "</th>"; 
-				   }).join("") +
-				   "</tr>");
+    $("#outputTable").handsontable({
+	data: NormalScore.gridData,
+	colHeaders: true
+    });
 
     $("#setupScales").handsontable({
-	data: myScales,
-	colHeaders: ["Name", "Type", "M", "SD", "Digits"],
+	data: NormalScore.scales,
+	colHeaders: ["Name", "Type", "M", "SD", "Digits", "Show"],
 	columns: [
 	    {data: "name"},
-	    {data: "type"},
-	    {data: "M"},
-	    {data: "SD"},
-	    {data: "digits"}
-	]
+	    {data: "type",
+	     type: "autocomplete",
+	     source: ["Normal", "Discrete", "Percentile"],
+	     strict: true},
+	    {data: "M",
+	     type: "numeric"},
+	    {data: "SD",
+	     type: "numeric"},
+	    {data: "digits",
+	     type: "numeric"},
+	    {data: "show",
+	     type: Handsontable.CheckboxCell}
+	],
+	minSpareRows: 1,
+	fillHandle: "vertical",
+	onBeforeChange: function (data) {
+	    console.log("onBeforeChange");
+	    console.log(data);
+	    for (var i = 0; i < data.length; i++) {
+		// each data[i] is a change: [row, col, oldVal, newVal]
+		// setting newVal to false discards the change
+		switch (data[i][1]) { // column
+		case "M":
+		case "SD":
+		case "digits":
+		    var number = parseFloat(data[i][3]);
+		    if ($.isNumeric(number))
+			data[i][3] = number;
+		    else
+			data[i][3] = null;
+		    break;
+		}
+	    }
+	},
+	onChange: function (changes, source) {
+	    renderScoreTable();
+	}
     });
 				   
 });
