@@ -146,8 +146,6 @@ function renderScoreTable() {
 	    return toScaleFormattedString(z, scale);
 	});
     });
-    console.log(colHeaders);
-    console.log(newData);
     $("#outputTable").handsontable('loadData', newData);
     $("#outputTable").handsontable('updateSettings', 
 				   {colHeaders: colHeaders});
@@ -255,8 +253,6 @@ $(document).ready(function() {
 	minSpareRows: 1,
 	fillHandle: "vertical",
 	onBeforeChange: function (data) {
-	    console.log("onBeforeChange");
-	    console.log(data);
 	    for (var i = 0; i < data.length; i++) {
 		// each data[i] is a change: [row, col, oldVal, newVal]
 		// setting newVal to false discards the change
