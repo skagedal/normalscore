@@ -176,6 +176,10 @@ function renderScoreTable() {
 	    return toScaleFormattedString(z, scale);
 	});
     });
+    if (newData.length === 0) {
+	// Show an empty row, otherwise headers don't show
+	newData = [ activeScales.map(function() { return ""; }) ];
+    }
     $("#outputTable").handsontable('loadData', newData);
     $("#outputTable").handsontable('updateSettings', 
 				   {colHeaders: colHeaders});
@@ -275,6 +279,7 @@ $(document).ready(function() {
 	data: NormalScore.gridData,
 	colHeaders: true
     });
+    renderScoreTable();
 
     $("#setupScales").handsontable({
 	data: NormalScore.scales,
@@ -286,9 +291,11 @@ $(document).ready(function() {
 	     source: ["Normal", "Discrete", "Percentile"],
 	     strict: true},
 	    {data: "M",
-	     type: "numeric"},
+	     type: "numeric",
+	     format: "0.00"},
 	    {data: "SD",
-	     type: "numeric"},
+	     type: "numeric",
+	     format: "0.00"},
 	    {data: "digits",
 	     type: "numeric"},
 	    {data: "show",
@@ -318,5 +325,18 @@ $(document).ready(function() {
 	    updateInputType();
 	}
     });
-				   
+
+    $("#setupScales").hide();
+    $("#hideScaleSettings").hide();
+    $("#showScaleSettings").click(function () {
+	$("#setupScales").slideDown();
+	$("#showScaleSettings").hide();
+	$("#hideScaleSettings").show();
+    });
+    $("#hideScaleSettings").click(function () {
+	$("#setupScales").slideUp();
+	$("#showScaleSettings").show();
+	$("#hideScaleSettings").hide();
+    });
+    
 });
