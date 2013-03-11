@@ -1,58 +1,66 @@
+// Object to hold all global app data
 var NormalScore = {
+    scaleType: {
+	NORMAL: "Normal",
+	DISCRETE: "Discrete",
+	PERCENTILE: "Percentile"
+    },
+
     zscores: [],
     gridData: [],
+
+    // Factory settings
     defaultScales: null,
+
+    // Currently used scale setup
     scales: null,
+
+    // Flot widget
+    plot: null
 };
-
-var normalPlot;
-
-var SCALETYPE_NORMAL = "Normal";
-var SCALETYPE_DISCRETE = "Discrete";
-var SCALETYPE_PERCENTILE = "Percentile";
 
 NormalScore.defaultScales = [
     {name: "Z-score",
-     type: SCALETYPE_NORMAL,
+     type: NormalScore.scaleType.NORMAL,
      M: 0,
      SD: 1,
      digits: 2,
      show: true},
     {name: "IQ",
-     type: SCALETYPE_NORMAL,
+     type: NormalScore.scaleType.NORMAL,
      M: 100,
      SD: 15,
      digits: 1,
      show: true},
     {name: "T-score",
-     type: SCALETYPE_NORMAL,
+     type: NormalScore.scaleType.NORMAL,
      M: 50,
      SD: 10,
      digits: 1,
      show: true},
     {name: "Stanine",
-     type: SCALETYPE_DISCRETE,
+     type: NormalScore.scaleType.DISCRETE,
      M: 5,
      SD: 2,
      min: 1,
      max: 9,
      show: true},
     {name: "Sten",
-     type: SCALETYPE_DISCRETE,
+     type: NormalScore.scaleType.DISCRETE,
      M: 5.5,
      SD: 2,
      min: 1,
      max: 10,
      show: false},
     {name: "Standard 19",
-     type: SCALETYPE_DISCRETE,
+     type: NormalScore.scaleType.DISCRETE,
      M: 10,
      SD: 3,
      min: 1,
      max: 19,
      show: true},
     {name: "Percentile",
-     type: SCALETYPE_PERCENTILE,
+     type: NormalScore.scaleType.PERCENTILE,
      SD: 100,			// used here for scaling
      digits: 2,
      show: true}
@@ -61,13 +69,30 @@ NormalScore.defaultScales = [
 // deep copy
 NormalScore.scales = $.extend(true, [], NormalScore.defaultScales);
 
-var defaultScaleOrder = [
-    "Z-score", "IQ", "T-score", "Stanine", "Sten", "Standard 19", "Percentile"];
-
 function getScaleInfo(scaleName) {
     return $.grep(NormalScore.scales, function (element, index) {
 	return element.name === scaleName; 
     })[0];
+}
+
+function checkScaleInfoValidity(scaleInfo) { 
+    if (typeof (scaleInfo) === "undefined")
+	throw new Error("Invalid scale info: undefined");
+    switch (scaleInfo.type) {
+    case NormalScore.scaleType.NORMAL:
+    case NormalScore.scaleType.DISCRETE:
+	if (!$.isNumeric(scaleInfo.M))
+	    throw new Error("Invalid scale info: M not set or is not numeric");
+	if (!$.isNumeric(scaleInfo.SD))
+	    throw new Error("Invalid scale info: SD not set or is not numeric");
+	if (scaleInfo.SD == 0)
+	    throw new Error("Invalid scale info: SD is zero");
+	return true;
+    case NormalScore.scaleType.PERCENTILE:
+	return true;
+    }
+    throw new Error(sprintf("Invalid scale info %s: invalid scale type: %s", scaleInfo.name,
+			    scaleInfo.type));
 }
 
 function toScale(z, scaleInfo) {
@@ -76,13 +101,13 @@ function toScale(z, scaleInfo) {
     var factor = $.isNumeric(scaleInfo.SD) ? scaleInfo.SD : 1;
     var offset = $.isNumeric(scaleInfo.M) ? scaleInfo.M : 0;
     switch(scaleInfo.type) {
-    case SCALETYPE_NORMAL:
+    case NormalScore.scaleType.NORMAL:
 	scaleValue = z * factor + offset;
 	break;
-    case SCALETYPE_DISCRETE:
+    case NormalScore.scaleType.DISCRETE:
 	scaleValue = Math.round(z * factor + offset);
 	break;
-    case SCALETYPE_PERCENTILE:
+    case NormalScore.scaleType.PERCENTILE:
 	scaleValue = jStat.normal.cdf(z, 0, 1) * factor + offset;
 	break;
     }
@@ -105,11 +130,11 @@ function fromScale(scaleValue, scaleInfo) {
     // such as "Stanine 19.3". Not sure if this makes sense, but 
     // if the user asks for it...? 
     switch(scaleInfo.type) {
-    case SCALETYPE_NORMAL:
-    case SCALETYPE_DISCRETE:
+    case NormalScore.scaleType.NORMAL:
+    case NormalScore.scaleType.DISCRETE:
 	z = (scaleValue - offset) / factor;
 	break;
-    case SCALETYPE_PERCENTILE:
+    case NormalScore.scaleType.PERCENTILE:
 	// Arbitrary clamping of input percentile to avoid silliness
 	var p = Math.min(0.9999999, 
 			 Math.max(0.0000001, (scaleValue - offset) / factor));
@@ -121,6 +146,11 @@ function fromScale(scaleValue, scaleInfo) {
 }
 
 function toScaleFormattedString(z, scaleInfo) {
+    try {
+	checkScaleInfoValidity(scaleInfo);
+    } catch (e) {
+	return "INVALID";
+    }
     // Converts z score to scale and formats it 
     var fmt = sprintf("%%.%df", scaleInfo.digits ? scaleInfo.digits : 0);
     return sprintf(fmt, toScale(z, scaleInfo));
@@ -159,7 +189,7 @@ function addScore(z) {
     var colors = ["#ff0000", "#ff8888", "#ffcccc", "#ffeeee"];
     var i;
 
-    var oldMarkings = normalPlot.getOptions().grid.markings;
+    var oldMarkings = NormalScore.plot.getOptions().grid.markings;
     var newMarkings = [ { xaxis: { from: z, to: z },
 			  color: colors[0] } ];
 
@@ -168,13 +198,14 @@ function addScore(z) {
 			    color: colors[i + 1] });
     }
 
-    normalPlot.getOptions().grid.markings = newMarkings;
-    normalPlot.draw();
+    NormalScore.plot.getOptions().grid.markings = newMarkings;
+    NormalScore.plot.draw();
 }
 
 function updateTooltip(z) {
-    $("#tooltip").html($.map(defaultScaleOrder, function(name) {
-	return name + "=" + toScaleFormattedString(z, getScaleInfo(name));
+    var activeScales = NormalScore.scales.filter(plucker("show"));
+    $("#tooltip").html($.map(activeScales, function(scale) {
+	return scale.name + "=" + toScaleFormattedString(z, scale);
     }).join(", "));
 }
 
@@ -183,7 +214,7 @@ $(document).ready(function() {
     for (var i = -5; i <= 5.0; i += 0.1)
         curve.push([i, jStat.normal.pdf(i, 0, 1)]);
 
-    normalPlot = $.plot($("#plot"), [
+    NormalScore.plot = $.plot($("#plot"), [
 	{ data: curve, label: null}
     ], {
 	crosshair: {
@@ -223,8 +254,8 @@ $(document).ready(function() {
 	return false;		// abort default submit
     });
 
-    $("select#inputtype").append($.map(defaultScaleOrder, function(name) {
-	return sprintf("<option value=\"%s\">%s</option>", name, name);
+    $("select#inputtype").append($.map(NormalScore.scales, function(scale) {
+	return sprintf("<option value=\"%s\">%s</option>", scale.name, scale.name);
     }));
 
     $("#outputTable").handsontable({
