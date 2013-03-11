@@ -209,6 +209,21 @@ function updateTooltip(z) {
     }).join(", "));
 }
 
+function updateInputType() {
+    var nonEmptyScales = NormalScore.scales.filter(plucker("name"));
+    var newHtml = nonEmptyScales.map(function(scale) {
+	return sprintf("<option value=\"%s\">%s</option>", 
+		       scale.name, scale.name);
+    }).join("");
+
+    var select = $("#inputtype");
+    // This method to keep the old value selected seems to work in Firefox,
+    // but not in IE8. Well well.
+    var oldVal = select.val();
+    select.html(newHtml);
+    select.val(oldVal);
+}
+
 $(document).ready(function() {
     var curve = [];
     for (var i = -5; i <= 5.0; i += 0.1)
@@ -254,9 +269,7 @@ $(document).ready(function() {
 	return false;		// abort default submit
     });
 
-    $("select#inputtype").append($.map(NormalScore.scales, function(scale) {
-	return sprintf("<option value=\"%s\">%s</option>", scale.name, scale.name);
-    }));
+    updateInputType();
 
     $("#outputTable").handsontable({
 	data: NormalScore.gridData,
@@ -302,6 +315,7 @@ $(document).ready(function() {
 	},
 	onChange: function (changes, source) {
 	    renderScoreTable();
+	    updateInputType();
 	}
     });
 				   
