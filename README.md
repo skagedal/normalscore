@@ -11,9 +11,16 @@ Uses the following libraries, all included for convenience:
 * [jStat] [3] -- for statistics. Note, I use the Github version, not the 
   one on jstat.org.
 * [JavaScript sprintf] [4] -- can't code without a sprintf.
+* [Handsontable] [5] -- a clean and simple Excel-like data grid editor.
+* [FlashCanvas] [6] -- emulation of HTML5 Canvas on Internet Explorer via 
+  Flash.
+* [ES5 Shim] [7] -- ECMAScript 5 compatibility shims for legacy
+  JavaScript engines.
 
   [1]: http://jquery.com/
   [2]: http://www.flotcharts.org/
   [3]: https://github.com/jstat/jstat
   [4]: http://www.diveintojavascript.com/projects/javascript-sprintf
-
+  [5]: http://handsontable.com/
+  [6]: http://flashcanvas.net/
+  [7]: https://github.com/kriskowal/es5-shim
