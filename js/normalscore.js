@@ -66,6 +66,16 @@ NormalScore.defaultScales = [
      show: true}
 ];
 
+// temp hack
+NormalScore.Z = NormalScore.defaultScales[0];
+NormalScore.IQ = NormalScore.defaultScales[1];
+NormalScore.T = NormalScore.defaultScales[2];
+NormalScore.Stanine = NormalScore.defaultScales[3];
+NormalScore.Sten = NormalScore.defaultScales[4];
+NormalScore.Sta19 = NormalScore.defaultScales[5];
+NormalScore.Percentile = NormalScore.defaultScales[6];
+
+
 // deep copy
 NormalScore.scales = $.extend(true, [], NormalScore.defaultScales);
 
@@ -118,7 +128,7 @@ function toScale(z, scaleInfo) {
 
     return scaleValue;
 }
-   
+
 function fromScale(scaleValue, scaleInfo) {
     var z;
     // "SD" should really be read as scale factor, and "M" as offset
@@ -145,6 +155,19 @@ function fromScale(scaleValue, scaleInfo) {
     return z;
 }
 
+// Curried versions
+function createToScaleFunction(scaleInfo) {
+    return function(z) {
+	return toScale(z, scaleInfo);
+    };
+}
+   
+function createFromScaleFunction(scaleInfo) {
+    return function(scaleValue) {
+	return fromScale(scaleValue, scaleInfo);
+    };
+}
+   
 function toScaleFormattedString(z, scaleInfo) {
     try {
 	checkScaleInfoValidity(scaleInfo);
@@ -243,8 +266,31 @@ $(document).ready(function() {
 	    markings: [],
 	    clickable: true,
 	    hoverable: true
-	}
-	
+	},
+	xaxes: [
+	    { min: -5,
+	      max: 5,
+	      position: "bottom"
+	    },
+	    { min: toScale(-5, NormalScore.IQ),
+	      max: toScale(5, NormalScore.IQ),
+	      position: "bottom",
+	      alignTicksWithAxis: 1,
+	      show: true},
+	    /*
+	    // Ah, this doesn't work of course with fixed vals:
+	    { min: toScale(-5, NormalScore.Sta19),
+	      max: toScale(5, NormalScore.Sta19),
+	      position: "bottom",
+	      show: true}, */
+	    { min: toScale(-5, NormalScore.Percentile),
+	      max: toScale(5, NormalScore.Percentile),
+	      transform: createFromScaleFunction(NormalScore.Percentile),
+	      position: "bottom",
+	      alignTicksWithAxis: 1,
+	      show: true},
+	    
+	]
     });
 
     $("#plot").bind("plotclick", function (event, pos, item) {
