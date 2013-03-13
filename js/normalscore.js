@@ -270,12 +270,20 @@ $(document).ready(function() {
 	xaxes: [
 	    { min: -5,
 	      max: 5,
-	      position: "bottom"
+	      position: "bottom",
+	      axisLabel: "Z-score",
+	      axisLabelUseCanvas: true,
+	      axisLabelPadding: 5,
+	      axisLabelFontSizePixels: 10,
 	    },
 	    { min: toScale(-5, NormalScore.IQ),
 	      max: toScale(5, NormalScore.IQ),
-	      position: "bottom",
+	      position: "top",
 	      alignTicksWithAxis: 1,
+	      axisLabel: "IQ",
+	      axisLabelUseCanvas: true,
+	      axisLabelPadding: 5,
+	      axisLabelFontSizePixels: 10,
 	      show: true},
 	    /*
 	    // Ah, this doesn't work of course with fixed vals:
@@ -288,6 +296,10 @@ $(document).ready(function() {
 	      transform: createFromScaleFunction(NormalScore.Percentile),
 	      position: "bottom",
 	      alignTicksWithAxis: 1,
+	      axisLabel: "Percentile",
+	      axisLabelUseCanvas: true,
+	      axisLabelPadding: 5,
+	      axisLabelFontSizePixels: 10,
 	      show: true},
 	    
 	]
