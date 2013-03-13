@@ -105,7 +105,7 @@ function checkScaleInfoValidity(scaleInfo) {
 			    scaleInfo.type));
 }
 
-function toScale(z, scaleInfo) {
+function toScale(scaleInfo, z) {
     var scaleValue;
     // "SD" should really be read as scale factor, and "M" as offset
     var factor = $.isNumeric(scaleInfo.SD) ? scaleInfo.SD : 1;
@@ -129,7 +129,7 @@ function toScale(z, scaleInfo) {
     return scaleValue;
 }
 
-function fromScale(scaleValue, scaleInfo) {
+function fromScale(scaleInfo, scaleValue) {
     var z;
     // "SD" should really be read as scale factor, and "M" as offset
     var factor = $.isNumeric(scaleInfo.SD) ? scaleInfo.SD : 1;
@@ -158,17 +158,17 @@ function fromScale(scaleValue, scaleInfo) {
 // Curried versions
 function createToScaleFunction(scaleInfo) {
     return function(z) {
-	return toScale(z, scaleInfo);
+	return toScale(scaleInfo, z);
     };
 }
    
 function createFromScaleFunction(scaleInfo) {
     return function(scaleValue) {
-	return fromScale(scaleValue, scaleInfo);
+	return fromScale(scaleInfo, scaleValue);
     };
 }
    
-function toScaleFormattedString(z, scaleInfo) {
+function toScaleFormattedString(scaleInfo, z) {
     try {
 	checkScaleInfoValidity(scaleInfo);
     } catch (e) {
@@ -176,7 +176,7 @@ function toScaleFormattedString(z, scaleInfo) {
     }
     // Converts z score to scale and formats it 
     var fmt = sprintf("%%.%df", scaleInfo.digits ? scaleInfo.digits : 0);
-    return sprintf(fmt, toScale(z, scaleInfo));
+    return sprintf(fmt, toScale(scaleInfo, z));
 }
 
 function roundNumber(number, digits) {
@@ -196,7 +196,7 @@ function renderScoreTable() {
     var colHeaders = activeScales.map(plucker("name"));
     var newData = NormalScore.zscores.map(function (z) {
 	return activeScales.map(function(scale) {
-	    return toScaleFormattedString(z, scale);
+	    return toScaleFormattedString(scale, z);
 	});
     });
     if (newData.length === 0) {
@@ -232,7 +232,7 @@ function addScore(z) {
 function updateTooltip(z) {
     var activeScales = NormalScore.scales.filter(plucker("show"));
     $("#tooltip").html($.map(activeScales, function(scale) {
-	return scale.name + "=" + toScaleFormattedString(z, scale);
+	return scale.name + "=" + toScaleFormattedString(scale, z);
     }).join(", "));
 }
 
@@ -272,19 +272,19 @@ $(document).ready(function() {
 	      max: 5,
 	      position: "bottom"
 	    },
-	    { min: toScale(-5, NormalScore.IQ),
-	      max: toScale(5, NormalScore.IQ),
+	    { min: toScale(NormalScore.IQ, -5),
+	      max: toScale(NormalScore.IQ, 5),
 	      position: "bottom",
 	      alignTicksWithAxis: 1,
 	      show: true},
 	    /*
 	    // Ah, this doesn't work of course with fixed vals:
-	    { min: toScale(-5, NormalScore.Sta19),
-	      max: toScale(5, NormalScore.Sta19),
+	    { min: toScale(NormalScore.Sta19, -5),
+	      max: toScale(NormalScore.Sta19, 5),
 	      position: "bottom",
 	      show: true}, */
-	    { min: toScale(-5, NormalScore.Percentile),
-	      max: toScale(5, NormalScore.Percentile),
+	    { min: toScale(NormalScore.Percentile, -5),
+	      max: toScale(NormalScore.Percentile, 5),
 	      transform: createFromScaleFunction(NormalScore.Percentile),
 	      position: "bottom",
 	      alignTicksWithAxis: 1,
@@ -313,7 +313,7 @@ $(document).ready(function() {
 	var score = parseFloat($("#score").val());
 	var scaleName = $("#inputtype").val();
 	var scaleInfo = getScaleInfo(scaleName);
-	addScore(fromScale(score, scaleInfo));
+	addScore(fromScale(scaleInfo, score));
 
 	$("#score").val("");
 	return false;		// abort default submit
