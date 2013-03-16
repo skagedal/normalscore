@@ -5,6 +5,11 @@ var NormalScore = {
 	DISCRETE: "Discrete",
 	PERCENTILE: "Percentile"
     },
+    scaleAxis: {
+	NONE: "None",
+	TOP: "Top",
+	BOTTOM: "Bottom"
+    },
 
     zscores: [],
     gridData: [],
@@ -25,45 +30,52 @@ NormalScore.defaultScales = [
      M: 0,
      SD: 1,
      digits: 2,
-     show: true},
+     show: true,
+     axis: NormalScore.scaleAxis.NONE},	// Z-score is however always shown
     {name: "IQ",
      type: NormalScore.scaleType.NORMAL,
      M: 100,
      SD: 15,
      digits: 1,
-     show: true},
+     show: true,
+     axis: NormalScore.scaleAxis.BOTTOM},
     {name: "T-score",
      type: NormalScore.scaleType.NORMAL,
      M: 50,
      SD: 10,
      digits: 1,
-     show: true},
+     show: true,
+     axis: NormalScore.scaleAxis.BOTTOM},
     {name: "Stanine",
      type: NormalScore.scaleType.DISCRETE,
      M: 5,
      SD: 2,
      min: 1,
      max: 9,
-     show: true},
+     show: true,
+     axis: NormalScore.scaleAxis.NONE},
     {name: "Sten",
      type: NormalScore.scaleType.DISCRETE,
      M: 5.5,
      SD: 2,
      min: 1,
      max: 10,
-     show: false},
+     show: false,
+     axis: NormalScore.scaleAxis.NONE},
     {name: "Standard 19",
      type: NormalScore.scaleType.DISCRETE,
      M: 10,
      SD: 3,
      min: 1,
      max: 19,
-     show: true},
+     show: true,
+     axis: NormalScore.scaleAxis.NONE},
     {name: "Percentile",
      type: NormalScore.scaleType.PERCENTILE,
      SD: 100,			// used here for scaling
      digits: 2,
-     show: true}
+     show: true,
+     axis: NormalScore.scaleAxis.BOTTOM}
 ];
 
 // temp hack
@@ -167,6 +179,18 @@ function createFromScaleFunction(scaleInfo) {
 	return fromScale(scaleInfo, scaleValue);
     };
 }
+
+// Make Discrete type Normal and remove min/max clamping 
+// Need this for calculation of plot axes
+function normalizeScale(scaleInfo) {
+    var newScaleInfo = $.extend({}, scaleInfo);
+    newScaleInfo.min = null;
+    newScaleInfo.max = null;
+    if (newScaleInfo.type === NormalScore.scaleType.DISCRETE)
+	newScaleInfo.type = NormalScore.scaleType.NORMAL;
+
+    return newScaleInfo;
+}
    
 function toScaleFormattedString(scaleInfo, z) {
     try {
@@ -251,13 +275,53 @@ function updateInputType() {
     select.val(oldVal);
 }
 
-$(document).ready(function() {
-    var curve = [];
-    for (var i = -5; i <= 5.0; i += 0.1)
-        curve.push([i, jStat.normal.pdf(i, 0, 1)]);
+function scaleHasAxis(scale) {
+    return scale.axis === NormalScore.scaleAxis.TOP ||
+	scale.axis === NormalScore.scaleAxis.BOTTOM;
+}
 
+function scaleGetAxisPosition(scale) {
+    switch (scale.axis) {
+    case NormalScore.scaleAxis.TOP:
+	return "top";
+    case NormalScore.scaleAxis.BOTTOM:
+	return "bottom";
+    }
+    return null;
+}
+
+function getXAxes(scales, zMin, zMax) {
+    var base = {
+	axisLabelUseCanvas: true,
+	axisLabelPadding: 5,
+	axisLabelFontSizePixels: 10,
+	show: true
+    };
+
+    function makeScaleAxis(scale) {
+	var nScale = normalizeScale(scale);
+	return $.extend({}, base, {
+	    min: toScale(nScale, zMin),
+	    max: toScale(nScale, zMax),
+	    transform: createFromScaleFunction(scale),
+	    position: scaleGetAxisPosition(scale),
+	    alignTicksWithAxis: 1,
+	    axisLabel: scale.name
+	});
+    }
+
+    return [$.extend({}, base, {
+	min: zMin, 
+	max: zMax, 
+	position: "bottom",
+	axisLabel: "Z-score"
+    })].concat(scales.filter(scaleHasAxis).map(makeScaleAxis));
+}
+
+function doPlot() {
     NormalScore.plot = $.plot($("#plot"), [
-	{ data: curve, label: null}
+	{ data: NormalScore.curve, 
+	  label: null}
     ], {
 	crosshair: {
 	    mode: "x"
@@ -267,43 +331,16 @@ $(document).ready(function() {
 	    clickable: true,
 	    hoverable: true
 	},
-	xaxes: [
-	    { min: -5,
-	      max: 5,
-	      position: "bottom",
-	      axisLabel: "Z-score",
-	      axisLabelUseCanvas: true,
-	      axisLabelPadding: 5,
-	      axisLabelFontSizePixels: 10,
-	    },
-	    { min: toScale(NormalScore.IQ, -5),
-	      max: toScale(NormalScore.IQ, 5),
-	      position: "bottom",
-	      alignTicksWithAxis: 1,
-	      axisLabel: "IQ",
-	      axisLabelUseCanvas: true,
-	      axisLabelPadding: 5,
-	      axisLabelFontSizePixels: 10,
-	      show: true},
-	    /*
-	    // Ah, this doesn't work of course with fixed vals:
-	    { min: toScale(NormalScore.Sta19, -5),
-	      max: toScale(NormalScore.Sta19, 5),
-	      position: "bottom",
-	      show: true}, */
-	    { min: toScale(NormalScore.Percentile, -5),
-	      max: toScale(NormalScore.Percentile, 5),
-	      transform: createFromScaleFunction(NormalScore.Percentile),
-	      position: "bottom",
-	      alignTicksWithAxis: 1,
-	      axisLabel: "Percentile",
-	      axisLabelUseCanvas: true,
-	      axisLabelPadding: 5,
-	      axisLabelFontSizePixels: 10,
-	      show: true},
-	    
-	]
+	xaxes: getXAxes(NormalScore.scales, -5, 5),
     });
+}
+
+$(document).ready(function() {
+    NormalScore.curve = [];
+    for (var i = -5; i <= 5.0; i += 0.1)
+        NormalScore.curve.push([i, jStat.normal.pdf(i, 0, 1)]);
+
+    doPlot();
 
     $("#plot").bind("plotclick", function (event, pos, item) {
 	addScore(pos.x);
@@ -341,7 +378,7 @@ $(document).ready(function() {
 
     $("#setupScales").handsontable({
 	data: NormalScore.scales,
-	colHeaders: ["Name", "Type", "M", "SD", "Digits", "Show"],
+	colHeaders: ["Name", "Type", "M", "SD", "Digits", "Axis", "Output"],
 	columns: [
 	    {data: "name"},
 	    {data: "type",
@@ -356,6 +393,10 @@ $(document).ready(function() {
 	     format: "0.00"},
 	    {data: "digits",
 	     type: "numeric"},
+	    {data: "axis",
+	     type: "autocomplete",
+	     source: ["None", "Top", "Bottom"],
+	     strict: true},
 	    {data: "show",
 	     type: Handsontable.CheckboxCell}
 	],
@@ -381,6 +422,7 @@ $(document).ready(function() {
 	onChange: function (changes, source) {
 	    renderScoreTable();
 	    updateInputType();
+	    doPlot();
 	}
     });
 
