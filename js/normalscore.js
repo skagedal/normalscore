@@ -31,7 +31,7 @@ NormalScore.defaultScales = [
      SD: 1,
      digits: 2,
      show: true,
-     axis: NormalScore.scaleAxis.NONE},	// Z-score is however always shown
+     axis: NormalScore.scaleAxis.BOTTOM},
     {name: "IQ",
      type: NormalScore.scaleType.NORMAL,
      M: 100,
@@ -53,7 +53,7 @@ NormalScore.defaultScales = [
      min: 1,
      max: 9,
      show: true,
-     axis: NormalScore.scaleAxis.NONE},
+     axis: NormalScore.scaleAxis.BOTTOM},
     {name: "Sten",
      type: NormalScore.scaleType.DISCRETE,
      M: 5.5,
@@ -290,32 +290,84 @@ function scaleGetAxisPosition(scale) {
     return null;
 }
 
-function getXAxes(scales, zMin, zMax) {
-    var base = {
-	axisLabelUseCanvas: true,
-	axisLabelPadding: 5,
-	axisLabelFontSizePixels: 10,
-	show: true
-    };
+var PERCENTILE_TICKS = [0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 0.95, 0.98];
 
+/**
+ * Curried function. Generates ticks.
+ */ 
+function scaleGetAxisTicks(scale, axis) {
+    function getTicks(axis) {
+	var ticks = [];
+	switch(scale.type) {
+	case NormalScore.scaleType.NORMAL:
+	    var z = Math.ceil(fromScale(scale, axis.min));
+	    var zMax = fromScale(scale, axis.max);
+	    while (z <= zMax) {
+		ticks.push(toScale(scale, z));
+		z++;
+	    }	   
+	    break;
+
+	case NormalScore.scaleType.DISCRETE:
+	    var min = scale.min ? Math.max(scale.min, axis.min) : axis.min;
+	    var max = scale.max ? Math.min(scale.max, axis.max) : axis.max;
+	    var tick = Math.ceil(min);
+	    while (tick <= max) {
+		ticks.push(tick);
+		tick++;
+	    }
+	    break;
+
+	case NormalScore.scaleType.PERCENTILE:
+	    var i = 0, len = PERCENTILE_TICKS.length;
+	    var factor = $.isNumeric(scale.SD) ? scale.SD : 1;
+	    var offset = $.isNumeric(scale.M) ? scale.M : 0;
+	    function tick(i) {
+		return PERCENTILE_TICKS[i] * factor + offset;
+	    }
+	    while (i < len && tick(i) < axis.min)
+		i++;
+	    while (i < len && tick(i) <= axis.max) {
+		ticks.push(tick(i));
+		i++;
+	    }
+	}
+
+	return ticks;
+    }
+
+    if (arguments.length > 1)
+	return getTicks(axis);
+    else
+	return getTicks;   
+}
+
+function getXAxes(scales, zMin, zMax) {
     function makeScaleAxis(scale) {
 	var nScale = normalizeScale(scale);
-	return $.extend({}, base, {
+	var axis = {
 	    min: toScale(nScale, zMin),
 	    max: toScale(nScale, zMax),
 	    transform: createFromScaleFunction(scale),
 	    position: scaleGetAxisPosition(scale),
-	    alignTicksWithAxis: 1,
-	    axisLabel: scale.name
-	});
+	    ticks: scaleGetAxisTicks(scale),
+	    axisLabel: scale.name,
+	    axisLabelUseCanvas: true,
+	    axisLabelPadding: 5,
+	    axisLabelFontSizePixels: 10,
+	    show: true
+	};
+	return axis;
     }
 
-    return [$.extend({}, base, {
+    return [{
+	// The Z scale towards which values are plotted. 
+	// Don't show this because we want user to set which axes to show.
+	// Can't set show to false; hide by giving it no ticks.
 	min: zMin, 
 	max: zMax, 
-	position: "bottom",
-	axisLabel: "Z-score"
-    })].concat(scales.filter(scaleHasAxis).map(makeScaleAxis));
+	ticks: []
+    }].concat(scales.filter(scaleHasAxis).map(makeScaleAxis));
 }
 
 function doPlot() {
