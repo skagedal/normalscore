@@ -1,5 +1,15 @@
 // Object to hold all global app data
 var NormalScore = {
+    MIN: -4,
+    MAX: 4,
+
+    axisLabelPadding: 7,
+    axisLabelFontSizePixels: 10,
+    labelHeight: 15,
+    extraAxisHeight: 18,	// I don't know where these come from
+
+    plotHeight: 150,
+
     scaleType: {
 	NORMAL: "Normal",
 	DISCRETE: "Discrete",
@@ -23,6 +33,10 @@ var NormalScore = {
     // Flot widget
     plot: null
 };
+
+NormalScore.totalAxisHeight = NormalScore.axisLabelPadding + 
+    NormalScore.axisLabelFontSizePixels + NormalScore.labelHeight + 
+    NormalScore.extraAxisHeight;
 
 NormalScore.defaultScales = [
     {name: "Z-score",
@@ -353,8 +367,9 @@ function getXAxes(scales, zMin, zMax) {
 	    ticks: scaleGetAxisTicks(scale),
 	    axisLabel: scale.name,
 	    axisLabelUseCanvas: true,
-	    axisLabelPadding: 5,
+	    axisLabelPadding: 7,
 	    axisLabelFontSizePixels: 10,
+	    labelHeight: 15,
 	    show: true
 	};
 	return axis;
@@ -371,6 +386,9 @@ function getXAxes(scales, zMin, zMax) {
 }
 
 function doPlot() {
+    var xaxes = getXAxes(NormalScore.scales, NormalScore.MIN, NormalScore.MAX);
+    $("#plot").height(NormalScore.plotHeight + 
+		      NormalScore.totalAxisHeight * (xaxes.length - 1));
     NormalScore.plot = $.plot($("#plot"), [
 	{ data: NormalScore.curve, 
 	  label: null}
@@ -383,13 +401,13 @@ function doPlot() {
 	    clickable: true,
 	    hoverable: true
 	},
-	xaxes: getXAxes(NormalScore.scales, -5, 5),
+	xaxes: xaxes
     });
 }
 
 $(document).ready(function() {
     NormalScore.curve = [];
-    for (var i = -5; i <= 5.0; i += 0.1)
+    for (var i = NormalScore.MIN; i <= NormalScore.MAX; i += 0.1)
         NormalScore.curve.push([i, jStat.normal.pdf(i, 0, 1)]);
 
     doPlot();

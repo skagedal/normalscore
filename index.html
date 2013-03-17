@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title>Normal Score Converter</title>
         <link rel="stylesheet" type="text/css" media="screen" 
-	      href="normalscore.css" />	
+	      href="css/normalscore.css" />	
 	<link rel="stylesheet" type="text/css" media="screen"
 	      href="css/jquery.handsontable.full.css" />
 
@@ -25,43 +25,41 @@
         <script type="text/javascript" src="js/normalscore.js"></script>
     </head>
     <body>
-      <div id="contentDiv">
-
-	<h2>Input</h2>
-
-	<p>
-	  <form id="scoreform" autocomplete="off">
-	    <select id="inputtype">
-	    </select>
-	    <input id="score" type="text" autocomplete="off"></input>
-	    <input type="submit" value="Go"></input>
-	  </form>
-	</p>
-
+      <div id="header">
+	<ul id="menu">
+	  <li><a href="#">Normal Score Converter</a></li>
+	  <li><a href="#">About</a></li>
+	</ul>
+      </div>
+      <div id="plotContainer" class="container">
         <div id="plot">&nbsp;</div>
 
 	<p id="tooltip"></p><br /><br />
-
-	<h2>Output</h2>
+      </div>
+      <div id="tableContainer" class="container">
+	<form id="scoreform" autocomplete="off">
+	  <select id="inputtype">
+	  </select>
+	  <input id="score" type="text" autocomplete="off"></input>
+	  <input type="submit" value="Go"></input>
+	</form>
 
 	<div id="outputTable"></div>
-
-	<p></p>
-	<hr />
+      </div>
+      <div id="settingsContainer" class="container">
 	<button id="showScaleSettings">Show scale settings</button>
 	<button id="hideScaleSettings">Hide scale settings</button>
 
-	<!-- <h2>Scale setup</h2> -->
-
 	<div id="setupScales"></div>
-
-	<hr />
+      </div>
+      <div id="footer">
+<!--
 	<p class="info">This is a tool to convert normally distributed
 	  variables between scales commonly used by psychologists. <br />
 	  <a href="https://github.com/skagedal/normalscore">Code.</a>
 	  <a href="mailto:skagedal@gmail.com">Contact.</a>
 	</p>
-
+-->
       </div>
       
 

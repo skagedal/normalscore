@@ -1,0 +1,107 @@
+html, body, ol, ul, li, div {
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+
+#header {
+    background-color: black;
+    color: white;
+    padding: 5px;
+    font-size: 130%;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+#menu {
+    background-color: black;
+    color: white;
+    padding: 0px;
+    padding-left: 1em;
+    font-size: 17px;
+    font-family: Helvetica, Arial, sans-serif;
+    list-style: none;
+    height: 20px;
+}
+#menu > li {
+    float: left;
+    padding-right: 1em;
+}
+#menu li a {
+    display: block;
+    text-decoration: none;
+    color: white;
+}
+
+#menu li a:hover {
+    color: #dddddd;
+}
+
+.container {
+    padding: 1em;
+}
+
+#plotContainer {
+    float: left;
+}
+
+#tableContainer {
+    float: right;
+    width: 50%;
+//    height: 100%;
+}
+
+#settingsContainer {
+    width: 50%;
+    float: right;
+}
+
+#footer {
+    clear: both;
+}
+
+form {
+    margin-bottom: 1em;
+}
+
+p.info {
+    font-size: small;
+    color: grey;
+}
+
+h2 {
+    font-weight: bold;
+    font-size: medium;
+}
+
+#score {
+    text-align: right; 
+}
+
+#plot {
+    width: 500px;
+    height: 400px;
+}
+
+#tooltip {
+    position: absolute;
+    border: 1px solid #777700;
+    background-color: #ffffdd;
+}
+
+.output {
+    border-collapse: collapse;
+    border: 1px solid black
+}
+
+.output th {
+    border: 1px solid black;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.output td {
+    border: 1px solid black;
+    padding-left: 1em;
+    padding-right: 1em;
+    text-align: right;
+}
