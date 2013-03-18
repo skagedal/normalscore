@@ -3,7 +3,9 @@ html, body, ol, ul, li, div {
     border: 0;
     padding: 0;
 }
-
+a {
+    text-decoration: none;
+}
 #header {
     background-color: black;
     color: white;
@@ -55,6 +57,10 @@ html, body, ol, ul, li, div {
     float: right;
 }
 
+#infoContainer {
+    max-width: 700px;
+}
+
 #footer {
     clear: both;
 }
@@ -73,8 +79,9 @@ h2 {
     font-size: medium;
 }
 
-#score {
+input#score {
     text-align: right; 
+    width: 8em;
 }
 
 #plot {

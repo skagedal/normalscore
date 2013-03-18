@@ -407,7 +407,7 @@ function doPlot() {
 
 $(document).ready(function() {
     NormalScore.curve = [];
-    for (var i = NormalScore.MIN; i <= NormalScore.MAX; i += 0.1)
+    for (var i = NormalScore.MIN; i <= NormalScore.MAX; i += 0.2)
         NormalScore.curve.push([i, jStat.normal.pdf(i, 0, 1)]);
 
     doPlot();
