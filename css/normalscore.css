@@ -45,14 +45,9 @@ html, body, ol, ul, li, div {
 }
 
 #tableContainer {
-    float: right;
-    width: 50%;
-//    height: 100%;
 }
 
 #settingsContainer {
-    width: 50%;
-    float: right;
 }
 
 #footer {
