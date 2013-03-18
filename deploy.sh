@@ -10,7 +10,7 @@ fi
 
 TARGET=$1
 echo "Copying files to $TARGET..."
-cp *.html *.css $TARGET
+cp *.html $TARGET
 mkdir -p $TARGET/css
 cp css/*.css $TARGET/css
 mkdir -p $TARGET/js

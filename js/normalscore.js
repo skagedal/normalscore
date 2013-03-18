@@ -92,16 +92,6 @@ NormalScore.defaultScales = [
      axis: NormalScore.scaleAxis.BOTTOM}
 ];
 
-// temp hack
-NormalScore.Z = NormalScore.defaultScales[0];
-NormalScore.IQ = NormalScore.defaultScales[1];
-NormalScore.T = NormalScore.defaultScales[2];
-NormalScore.Stanine = NormalScore.defaultScales[3];
-NormalScore.Sten = NormalScore.defaultScales[4];
-NormalScore.Sta19 = NormalScore.defaultScales[5];
-NormalScore.Percentile = NormalScore.defaultScales[6];
-
-
 // deep copy
 NormalScore.scales = $.extend(true, [], NormalScore.defaultScales);
 
@@ -394,12 +384,12 @@ function doPlot() {
 	  label: null}
     ], {
 	crosshair: {
-	    mode: "x"
+	    mode: "x",
+	    coverAxes: "x"
 	},
 	grid: {
 	    markings: [],
-	    clickable: true,
-	    hoverable: true
+	    clickable: true 
 	},
 	xaxes: xaxes
     });
