@@ -92,23 +92,10 @@ input#score {
 #tooltip {
     position: absolute;
     border: 1px solid #777700;
-    background-color: #ffffdd;
-}
-
-.output {
-    border-collapse: collapse;
-    border: 1px solid black
-}
-
-.output th {
-    border: 1px solid black;
-    padding-left: 1em;
-    padding-right: 1em;
-}
-
-.output td {
-    border: 1px solid black;
-    padding-left: 1em;
-    padding-right: 1em;
-    text-align: right;
+    padding: 5px;
+    background-color: rgba(255, 255, 70, 0.6);
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: x-small;
+    z-index: 150;
+    display: none;
 }

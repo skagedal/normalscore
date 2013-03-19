@@ -260,8 +260,8 @@ function addScore(z) {
 function updateTooltip(z) {
     var activeScales = NormalScore.scales.filter(plucker("show"));
     $("#tooltip").html($.map(activeScales, function(scale) {
-	return scale.name + "=" + toScaleFormattedString(scale, z);
-    }).join(", "));
+	return scale.name + " = " + toScaleFormattedString(scale, z);
+    }).join("<br />"));
 }
 
 function updateInputType() {
@@ -389,7 +389,9 @@ function doPlot() {
 	},
 	grid: {
 	    markings: [],
-	    clickable: true 
+	    clickable: true,
+	    hoverable: true,
+	    autoHighlight: false,
 	},
 	xaxes: xaxes
     });
@@ -413,6 +415,9 @@ $(document).ready(function() {
     $("#plot").mouseleave(function (event) {
 	$("#tooltip").hide();
     });
+
+    var offset = NormalScore.plot.offset();
+    $("#tooltip").css({left: offset.left + 10, top: offset.top});
 
     $("select#inputtype").change(function() {
 	$("#score").val("");
