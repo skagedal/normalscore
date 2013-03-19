@@ -257,11 +257,47 @@ function addScore(z) {
     NormalScore.plot.draw();
 }
 
+/**
+ * If plot.currentTooltip is set, it is an array of strings to display
+ * in a tooltip on one line each.
+ */
+function drawTooltip(plot, ctx) {
+    if (!plot.currentTooltip)
+	return;
+    var plotOffset = plot.getPlotOffset();
+    var ttOffsetX = 7, ttOffsetY = 7, ttPaddingX = 5, ttPaddingY = 5;
+    var ttFontHeight = 10;
+
+    ctx.save();
+    ctx.translate(plotOffset.left, plotOffset.top)
+    ctx.textBaseline = "top";
+    ctx.font = ttFontHeight + "px sans-serif";
+
+    var ttWidth = Math.max.apply(null, plot.currentTooltip.map(function(s) {
+	return ctx.measureText(s).width;
+    })) + ttPaddingX * 2;
+    var ttHeight = plot.currentTooltip.length * ttFontHeight + ttPaddingY * 2;
+    
+    ctx.fillStyle = "rgba(255, 255, 70, 0.6)";
+    ctx.fillRect(ttOffsetX, ttOffsetY, ttWidth, ttHeight);
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(ttOffsetX, ttOffsetY, ttWidth, ttHeight);
+    ctx.fillStyle = "rgb(0, 0, 0)";
+    for (var i = 0; i < plot.currentTooltip.length; i++) {
+	ctx.fillText(plot.currentTooltip[i],
+		     ttOffsetX + ttPaddingX,
+		     ttOffsetY + ttPaddingY + i * ttFontHeight);
+    }
+    ctx.restore();
+}
+
 function updateTooltip(z) {
     var activeScales = NormalScore.scales.filter(plucker("show"));
-    $("#tooltip").html($.map(activeScales, function(scale) {
+    NormalScore.plot.currentTooltip = activeScales.map(function(scale) {
 	return scale.name + " = " + toScaleFormattedString(scale, z);
-    }).join("<br />"));
+    });
+    NormalScore.plot.triggerRedrawOverlay();
 }
 
 function updateInputType() {
@@ -393,7 +429,10 @@ function doPlot() {
 	    hoverable: true,
 	    autoHighlight: false,
 	},
-	xaxes: xaxes
+	xaxes: xaxes,
+	hooks: {
+	    drawOverlay: drawTooltip
+	}
     });
 }
 
@@ -409,15 +448,12 @@ $(document).ready(function() {
     });
 
     $("#plot").bind("plothover", function (event, pos, item) {
-	$("#tooltip").show();
 	updateTooltip(pos.x);
     });
     $("#plot").mouseleave(function (event) {
-	$("#tooltip").hide();
+	NormalScore.plot.currentTooltip = null;
+	NormalScore.plot.triggerRedrawOverlay();
     });
-
-    var offset = NormalScore.plot.offset();
-    $("#tooltip").css({left: offset.left + 10, top: offset.top});
 
     $("select#inputtype").change(function() {
 	$("#score").val("");

@@ -89,13 +89,3 @@ input#score {
     z-index: 100;
 }
 
-#tooltip {
-    position: absolute;
-    border: 1px solid #777700;
-    padding: 5px;
-    background-color: rgba(255, 255, 70, 0.6);
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: x-small;
-    z-index: 150;
-    display: none;
-}
