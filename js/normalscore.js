@@ -76,7 +76,7 @@ NormalScore.defaultScales = [
      max: 10,
      show: false,
      axis: NormalScore.scaleAxis.NONE},
-    {name: "Standard 19",
+    {name: "Wechsler 19",
      type: NormalScore.scaleType.DISCRETE,
      M: 10,
      SD: 3,
@@ -441,7 +441,8 @@ $(document).ready(function() {
 
     $("#setupScales").handsontable({
 	data: NormalScore.scales,
-	colHeaders: ["Name", "Type", "M", "SD", "Digits", "Axis", "Output"],
+	colHeaders: ["Name", "Type", "M", "SD", "Min", "Max", 
+		     "Digits", "Axis", "Output"],
 	columns: [
 	    {data: "name"},
 	    {data: "type",
@@ -454,6 +455,12 @@ $(document).ready(function() {
 	    {data: "SD",
 	     type: "numeric",
 	     format: "0.00"},
+	    {data: "min",
+	     type: "numeric",
+	     format: "0"},
+	    {data: "max",
+	     type: "numeric",
+	     format: "0"},
 	    {data: "digits",
 	     type: "numeric"},
 	    {data: "axis",
@@ -487,19 +494,6 @@ $(document).ready(function() {
 	    updateInputType();
 	    doPlot();
 	}
-    });
-
-    $("#setupScales").hide();
-    $("#hideScaleSettings").hide();
-    $("#showScaleSettings").click(function () {
-	$("#setupScales").slideDown();
-	$("#showScaleSettings").hide();
-	$("#hideScaleSettings").show();
-    });
-    $("#hideScaleSettings").click(function () {
-	$("#setupScales").slideUp();
-	$("#showScaleSettings").show();
-	$("#hideScaleSettings").hide();
     });
     
 });
