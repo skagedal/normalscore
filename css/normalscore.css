@@ -72,8 +72,9 @@ p.info {
 }
 
 h2 {
-    font-weight: bold;
-    font-size: medium;
+    font-size: xx-small;
+    color: grey;
+    text-transform: uppercase;
 }
 
 input#score {
@@ -84,6 +85,7 @@ input#score {
 #plot {
     width: 500px;
     height: 400px;
+    z-index: 100;
 }
 
 #tooltip {
