@@ -432,7 +432,10 @@ $(document).ready(function() {
 
     $("#outputTable").handsontable({
 	data: NormalScore.gridData,
-	colHeaders: true
+	colHeaders: true,
+	cells: function (row, col, prop) {
+	    return { readOnly: true };
+	}
     });
     renderScoreTable();
 

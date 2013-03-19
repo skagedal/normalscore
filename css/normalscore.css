@@ -75,6 +75,7 @@ h2 {
     font-size: xx-small;
     color: grey;
     text-transform: uppercase;
+    font-family: Helvetica, Arial, sans-serif;
 }
 
 input#score {
