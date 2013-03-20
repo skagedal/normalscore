@@ -237,10 +237,9 @@ function renderScoreTable() {
 }
 
 function getGridMarkings() {
-    var colors = ["#FF0000", "#FFFF00", "#00FF00", "#0000FF",
-		  "#FF00FF", "#008000", "#00FFFF", "#008080",
-		  "#000000", "#C0C0C0", "#808080", "#FF69B4",
-		  "#FFA500"];
+    var colors = ["#FF0000", "#00FF00", "#0000FF", "#FF00FF", "#008000", 
+		  "#00FFFF", "#008080", "#000000", "#C0C0C0", "#808080", 
+		  "#FF69B4", "#FFA500", "#FFFF00"];
     var markings = [];
     for (var i = 0; i < Math.min(colors.length, NormalScore.zscores.length);
 	 i++) {
@@ -549,5 +548,11 @@ $(document).ready(function() {
 	    doPlot();
 	}
     });
-    
+
+    $(".showHide").click(function() {
+	$("#setupScales").slideToggle();
+	$(".showHide").toggle();
+    });
+    $("#hideSetup").hide();
+    $("#setupScales").hide();
 });

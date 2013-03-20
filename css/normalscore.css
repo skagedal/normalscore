@@ -53,24 +53,8 @@ a {
     padding: 1em;
 }
 
-#plotContainer {
-    float: left;
-}
-
-#tableContainer {
-    margin-left: 517px;
-}
-
-#settingsContainer {
-    margin-left: 517px;
-}
-
 #infoContainer {
     max-width: 700px;
-}
-
-#footer {
-    clear: both;
 }
 
 form {
@@ -102,4 +86,25 @@ input#score {
 
 #outputTable {
     margin-bottom: 4px;
+}
+#setupScales {
+    margin-bottom: 4px;
+}
+
+@media all and (min-width: 900px) {
+    #plotContainer {
+	float: left;
+    }
+
+    #tableContainer {
+	margin-left: 517px;
+    }
+
+    #settingsContainer {
+	margin-left: 517px;
+    }
+
+    #footer {
+	clear: both;
+    }
 }
