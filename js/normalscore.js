@@ -236,25 +236,36 @@ function renderScoreTable() {
 				   {colHeaders: colHeaders});
 }
 
-function addScore(z) {
-    NormalScore.zscores.push(z);
+function getGridMarkings() {
+    var colors = ["#FF0000", "#FFFF00", "#00FF00", "#0000FF",
+		  "#FF00FF", "#008000", "#00FFFF", "#008080",
+		  "#000000", "#C0C0C0", "#808080", "#FF69B4",
+		  "#FFA500"];
+    var markings = [];
+    for (var i = 0; i < Math.min(colors.length, NormalScore.zscores.length);
+	 i++) {
+	markings.push({xaxis: {from: NormalScore.zscores[i],
+			       to: NormalScore.zscores[i]},
+		       color: colors[i]});
+    }
+    return markings;
+}
 
+function updateScores() {
     renderScoreTable();
 
-    var colors = ["#ff0000", "#ff8888", "#ffcccc", "#ffeeee"];
-    var i;
-
-    var oldMarkings = NormalScore.plot.getOptions().grid.markings;
-    var newMarkings = [ { xaxis: { from: z, to: z },
-			  color: colors[0] } ];
-
-    for (i = 0; i < Math.min(colors.length - 1, oldMarkings.length); i++) {
-	newMarkings.push( { xaxis: oldMarkings[i].xaxis,
-			    color: colors[i + 1] });
-    }
-
-    NormalScore.plot.getOptions().grid.markings = newMarkings;
+    NormalScore.plot.getOptions().grid.markings = getGridMarkings();
     NormalScore.plot.draw();
+}
+
+function addScore(z) {
+    NormalScore.zscores.push(z);
+    updateScores();
+}
+
+function clearScores() {
+    NormalScore.zscores = [];
+    updateScores();
 }
 
 /**
@@ -424,7 +435,7 @@ function doPlot() {
 	    coverAxes: "x"
 	},
 	grid: {
-	    markings: [],
+	    markings: getGridMarkings(),
 	    clickable: true,
 	    hoverable: true,
 	    autoHighlight: false,
@@ -479,6 +490,8 @@ $(document).ready(function() {
 	}
     });
     renderScoreTable();
+
+    $("#clearOutput").click(clearScores);
 
     $("#setupScales").handsontable({
 	data: NormalScore.scales,
