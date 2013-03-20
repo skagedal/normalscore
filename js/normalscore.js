@@ -429,6 +429,7 @@ function doPlot() {
 	{ data: NormalScore.curve, 
 	  label: null}
     ], {
+	canvas: true,
 	crosshair: {
 	    mode: "x",
 	    coverAxes: "x"
