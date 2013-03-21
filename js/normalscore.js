@@ -395,15 +395,16 @@ function scaleGetAxisTicks(scale, axis) {
 function getXAxes(scales, zMin, zMax) {
     function makeScaleAxis(scale) {
 	var nScale = normalizeScale(scale);
+	var axisPosition = scaleGetAxisPosition(scale);
 	var axis = {
 	    min: toScale(nScale, zMin),
 	    max: toScale(nScale, zMax),
 	    transform: createFromScaleFunction(scale),
-	    position: scaleGetAxisPosition(scale),
+	    position: axisPosition,
 	    ticks: scaleGetAxisTicks(scale),
 	    axisLabel: scale.name,
 	    axisLabelUseCanvas: true,
-	    axisLabelPadding: 7,
+	    axisLabelPadding: axisPosition === "top" ? 2 : 7,
 	    axisLabelFontSizePixels: 10,
 	    labelHeight: 15,
 	    show: true
