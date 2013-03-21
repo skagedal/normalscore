@@ -1,1 +1,6 @@
 *~
+*.mintmp.js
+js/normalscore-full.js
+*.pyc
+.deps
+prod.index.html
