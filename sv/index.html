@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>Normalpoängskonverteraren</title>
+
+        <link rel="stylesheet" type="text/css" media="screen" 
+	      href="../css/normalscore.css" />	
+	<link rel="stylesheet" type="text/css" media="screen"
+	      href="../css/jquery.handsontable.full.css" />
+	<!--[if lt IE 9]> <script type="text/javascript" src="../js/flashcanvas.js"></script> <![endif]-->
+	<script type="text/javascript"
+		src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript"
+		src="../js/normalscore-full.js">
+
+    </head>
+    <body>
+      <div id="header">
+	<ul id="menu">
+	  <li>Normalpoängskonverteraren</li>
+	  <li><a href="about/">Om</a></li>
+	</ul>
+      </div>
+      <div id="plotContainer" class="container">
+	<h2>Kurva</h2>
+        <div id="plot">&nbsp;</div>
+      </div>
+      <div id="tableContainer" class="container">
+	<h2>Indata</h2>
+	<form id="scoreform" autocomplete="off">
+	  <select id="inputtype">
+	  </select>
+	  <input id="score" type="text" autocomplete="off"></input>
+	  <input type="submit" value="Kör"></input>
+	</form>
+
+	<h2>Utdata</h2>
+	<div id="outputTable"></div>
+	<a id="clearOutput" class="action" href="#">Clear</a>
+      </div>
+      <div id="settingsContainer" class="container">
+	<h2>Skalinställningar</h2>
+	<a id="showSetup" class="action showHide" href="#">Visa</a>
+	<div id="setupScales"></div>
+	<a id="hideSetup" class="action showHide" href="#">Dölj</a>
+      </div>
+      <div id="footer">
+      </div>
+
+    </body>
+</html>
