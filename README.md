@@ -18,6 +18,8 @@ Uses the following libraries, all included for convenience:
 * [ES5 Shim] [7] -- ECMAScript 5 compatibility shims for legacy
   JavaScript engines.
 
+To build the project, just run `python3 build.py`. You'll need to have [yuicompressor](https://yui.github.io/yuicompressor/) installed (`brew install yuicompressor` if you're using Homebrew.)
+
   [1]: http://jquery.com/
   [2]: http://www.flotcharts.org/
   [3]: https://github.com/jstat/jstat

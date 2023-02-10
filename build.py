@@ -26,7 +26,7 @@ js_files = [
 
 for file in js_files:
     file.setdefault("minify", True)
-    file.setdefault("concat", not file.has_key("CDN"))
+    file.setdefault("concat", not "CDN" in file)
 
 def concat(files, output):
     destination = open(output, 'wb')
@@ -40,7 +40,7 @@ def script(x):
 def get_script_tags():
     html = ""
     for file in js_files:
-        if file.has_key("CDN"):
+        if "CDN" in file:
             html += script(file["CDN"])
         elif not file["concat"]:
             html += script("js/" + file["name"]) # hmm might be minified but w/e
@@ -58,7 +58,7 @@ def build():
     for file in js_files:
         if file["minify"]:
             file["minname"] = re.sub("\.js$", ".mintmp.js", file["name"])
-            run("yui-compressor", os.path.join("js", file["name"]), 
+            run("yuicompressor", os.path.join("js", file["name"]),
                 "-o", os.path.join("js", file["minname"]))
         else:
             file["minname"] = file["name"]
