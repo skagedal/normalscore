@@ -361,10 +361,10 @@ function scaleGetAxisTicks(scale, axis) {
 	case NormalScore.scaleType.DISCRETE:
 	    var min = scale.min ? Math.max(scale.min, axis.min) : axis.min;
 	    var max = scale.max ? Math.min(scale.max, axis.max) : axis.max;
-	    var tick = Math.ceil(min);
-	    while (tick <= max) {
-		ticks.push(tick);
-		tick++;
+	    var discrete_tick = Math.ceil(min);
+	    while (discrete_tick <= max) {
+		    ticks.push(discrete_tick);
+            discrete_tick++;
 	    }
 	    break;
 
