@@ -11,7 +11,7 @@ js_files = [
     # We handle flashcanvas separately.
     {"name": "jquery.min.js",
      "minify": False,
-     "CDN": "http://code.jquery.com/jquery-1.9.1.min.js"},
+     "CDN": "https://code.jquery.com/jquery-1.9.1.min.js"},
     {"name": "jquery.flot.js"},
     {"name": "jquery.flot.canvas.js"},
     {"name": "jquery.flot.crosshair.js"},
